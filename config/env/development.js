@@ -2,7 +2,7 @@
 
 module.exports = {
 	db: {
-		uri: 'mongodb://localhost/mean-dev',
+		uri: 'mongodb://localhost/reto',
 		options: {
 			user: '',
 			pass: ''
@@ -18,7 +18,7 @@ module.exports = {
 		}
 	},
 	app: {
-		title: 'MEAN.JS - Development Environment'
+		title: 'Reto - creating those redirects'
 	},
 	facebook: {
 		clientID: process.env.FACEBOOK_ID || 'APP_ID',
