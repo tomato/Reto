@@ -7,14 +7,24 @@ var Crawler = require('simplecrawler'),
 	errorHandler = require('./errors.server.controller'),
 	_ = require('lodash');
 
-exports.crawl = function(req, res) {
-    var pages = []
+module.exports = function(io, socket) {
+    io.emit('connected');
     
-    var crawler = Crawler.crawl("https://diaryofascrummaster.wordpress.com/", function(queueItem){
-        console.log("Completed fetching resource:",queueItem.url);
-        pages.push(queueItem);
-    });
-    crawler.on("complete",function(){
-        res.json(pages);
+    socket.on('crawl', function(url){
+        
+        var crawler = Crawler.crawl(url,function(queueItem){
+            console.log("Completed fetching resource:",queueItem.url);
+            io.emit('pageFound', queueItem);
+        });
+        
+        crawler.addFetchCondition(function(parsedURL) {
+            return !parsedURL.path.match(/\.(pdf|jpg|png|gif|css|js|svg|eot|woff|ttf|map)(\??.*)$/i);
+        });
+   
+        crawler.on("complete",function(){
+            io.emit('complete');
+        });
+        
+        
     });
 };

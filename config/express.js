@@ -5,6 +5,7 @@
  */
 var fs = require('fs'),
 	http = require('http'),
+	socketio = require('socket.io'),
 	https = require('https'),
 	express = require('express'),
 	morgan = require('morgan'),
@@ -16,7 +17,7 @@ var fs = require('fs'),
 	cookieParser = require('cookie-parser'),
 	helmet = require('helmet'),
 	passport = require('passport'),
-	mongoStore = require('connect-mongo')({
+	MongoStore = require('connect-mongo')({
 		session: session
 	}),
 	flash = require('connect-flash'),
@@ -27,6 +28,8 @@ var fs = require('fs'),
 module.exports = function(db) {
 	// Initialize express app
 	var app = express();
+	var server = http.createServer(app);
+	var io = socketio.listen(server);
 
 	// Globbing model files
 	config.getGlobbedFiles('./app/models/**/*.js').forEach(function(modelPath) {
@@ -97,15 +100,16 @@ module.exports = function(db) {
 	// CookieParser should be above session
 	app.use(cookieParser());
 
+	var mongoStore = new MongoStore({
+			db: db.connection.db,
+			collection: config.sessionCollection
+		})
 	// Express MongoDB session storage
 	app.use(session({
 		saveUninitialized: true,
 		resave: true,
 		secret: config.sessionSecret,
-		store: new mongoStore({
-			db: db.connection.db,
-			collection: config.sessionCollection
-		}),
+		store: mongoStore,
 		cookie: config.sessionCookie,
 		name: config.sessionName
 	}));
@@ -158,7 +162,9 @@ module.exports = function(db) {
 		// Return HTTPS server instance
 		return httpsServer;
 	}
+	
+	require('./socketio')(server,io,mongoStore);
 
 	// Return Express server instance
-	return app;
+	return server;
 };

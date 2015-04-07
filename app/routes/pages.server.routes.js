@@ -8,8 +8,8 @@ var users = require('../../app/controllers/users.server.controller'),
 
 module.exports = function(app) {
 	// Article Routes
-	app.route('/pages')
-		.get(pages.crawl)
+	//app.route('/pages')
+	//	.get(pages.crawl)
 
 	// Finish by binding the article middleware
 	//app.param('articleId', articles.articleByID);

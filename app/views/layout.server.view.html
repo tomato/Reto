@@ -57,7 +57,7 @@
 	<script type="text/javascript">
 		var user = {{ user | json | safe }};
 	</script>
-
+	<script src="/socket.io/socket.io.js"></script>
 	<!--Application JavaScript Files-->
 	{% for jsFile in jsFiles %}
 		<script type="text/javascript" src="{{jsFile}}"></script>
